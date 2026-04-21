@@ -94,7 +94,41 @@
   .toast.info{background:#3a5c8b;color:#fff}
   .toast.show{transform:translateX(-50%) translateY(0)}
 
-  @media(max-width:600px){.stats{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){
+    #admin{padding:16px 10px 60px}
+    .admin-header{flex-direction:column;gap:8px;margin-bottom:16px}
+    .admin-title{font-size:28px}
+    .admin-btns{width:100%}
+    .btn-sec{flex:1;text-align:center;padding:10px 8px;font-size:9px}
+    .stats{grid-template-columns:repeat(3,1fr);gap:8px}
+    .stat{padding:14px 8px}
+    .stat-n{font-size:22px}
+    .stat-l{font-size:8px;letter-spacing:1px}
+    .filter-row{gap:6px}
+    .ftab{padding:6px 10px;font-size:9px}
+
+    /* TABLE → CARDS on mobile */
+    .table-scroll{overflow-x:visible}
+    table,thead,tbody,th,td,tr{display:block}
+    thead{display:none}
+    tr.res-row{background:rgba(255,253,248,.85);border:1px solid rgba(184,146,74,.18);border-radius:12px;margin-bottom:10px;padding:14px 14px 10px;position:relative}
+    tr.res-row:hover td{background:transparent}
+    tr.empty-row{background:transparent;border:none}
+    tr.empty-row td{text-align:center;padding:30px 0;border:none}
+    td{padding:3px 0;border:none;font-size:14px}
+    td:first-child{font-size:15px;font-weight:500;margin-bottom:4px;color:var(--dark)}
+    .td-name strong{font-size:15px}
+    .td-email{font-size:12px;opacity:.65;display:block;margin-top:2px}
+    .td-date{font-size:11px;opacity:.4;display:block;margin-top:4px}
+    .td-msg{font-size:12px;opacity:.6;display:block;font-style:italic;margin-top:2px}
+    td:last-child{display:none}
+
+    /* Presencas table mobile */
+    .unres-grid{grid-template-columns:repeat(2,1fr)}
+    
+    /* Search */
+    .search-input{font-size:14px}
+  }
 </style>
 </head>
 <body>
