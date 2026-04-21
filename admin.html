@@ -330,11 +330,25 @@ function startListening(){
 
 // ── RENDER ──
 function renderAdmin(){
-  const total=GIFTS.length;
-  const done=Object.keys(reservas).length;
+  const totalSlots=GIFTS.reduce((acc,g)=>acc+g.qty,0);
+  const done=Object.values(reservas).reduce((acc,entries)=>{
+    if(!entries) return acc;
+    if(typeof entries==='object'&&!entries.nome) return acc+Object.keys(entries).length;
+    return acc+1;
+  },0);
+  const livresCount=GIFTS.reduce((acc,g)=>{
+    const entries=reservas[g.id];
+    let count=0;
+    if(entries){
+      if(typeof entries==='object'&&!entries.nome) count=Object.keys(entries).length;
+      else count=1;
+    }
+    return acc+Math.max(0, g.qty-count);
+  },0);
+  const total=totalSlots;
   const pct=Math.round(done/total*100);
   document.getElementById('s-res').textContent=done;
-  document.getElementById('s-liv').textContent=total-done;
+  document.getElementById('s-liv').textContent=livresCount;
   document.getElementById('s-pct').textContent=pct+'%';
   document.getElementById('prog-pct-lbl').textContent=pct+'%';
   document.getElementById('prog-fill').style.width=pct+'%';
@@ -346,20 +360,34 @@ function renderAdmin(){
   let rows=[];
 
   if(adminFilter==='todos'||adminFilter==='reservados'){
-    Object.entries(reservas).forEach(([id,r])=>{
-      const g=GIFTS.find(g=>g.id==id);
+    Object.entries(reservas).forEach(([giftId,entries])=>{
+      const g=GIFTS.find(g=>g.id==giftId);
       if(!g)return;
-      const dateStr=r.timestamp?new Date(r.timestamp).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-      if(q){
-        const hay=((r.nome||'')+' '+(r.sobrenome||'')+' '+(r.email||'')+' '+g.name).toLowerCase();
-        if(!hay.includes(q))return;
-      }
-      rows.push({id,g,r,dateStr,reserved:true});
+      // entries can be object of pushKey->reservation
+      const list = typeof entries==='object' && !entries.nome
+        ? Object.entries(entries)  // multiple: {pushKey: {nome,...}, ...}
+        : [['0', entries]];        // legacy single reservation
+      list.forEach(([pushKey, r])=>{
+        const dateStr=r.timestamp?new Date(r.timestamp).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+        if(q){
+          const hay=((r.nome||'')+' '+(r.sobrenome||'')+' '+(r.email||'')+' '+g.name).toLowerCase();
+          if(!hay.includes(q))return;
+        }
+        rows.push({id:giftId,pushKey,g,r,dateStr,reserved:true});
+      });
     });
   }
 
   if(adminFilter==='todos'||adminFilter==='livres'){
-    GIFTS.filter(g=>!reservas[g.id]).forEach(g=>{
+    GIFTS.filter(g=>{
+      const entries=reservas[g.id];
+      let count=0;
+      if(entries){
+        if(typeof entries==='object'&&!entries.nome) count=Object.keys(entries).length;
+        else count=1;
+      }
+      return count < g.qty;
+    }).forEach(g=>{
       if(q&&!g.name.toLowerCase().includes(q))return;
       rows.push({id:g.id,g,r:null,dateStr:'—',reserved:false});
     });
@@ -377,7 +405,7 @@ function renderAdmin(){
         <td class="td-email"><a href="mailto:${r.email}" style="color:inherit;text-decoration:none">${r.email||'—'}</a></td>
         <td class="td-msg">${r.msg?`"${r.msg}"`:'—'}</td>
         <td class="td-date">${dateStr}</td>
-        <td><button class="del-btn" onclick="confirmDelete(${id},'${g.name.replace(/'/g,"\'")}','${(r.nome+' '+r.sobrenome).trim().replace(/'/g,"\'")}')">Cancelar</button></td>
+        <td><button class="del-btn" onclick="confirmDelete('${id}','${pushKey}','${g.name.replace(/'/g,"\'")}','${(r.nome+' '+r.sobrenome).trim().replace(/'/g,"\'")}')">Cancelar</button></td>
       `:`
         <td><span class="td-icon">${g.icon}</span> ${g.name}</td>
         <td colspan="4" style="opacity:.3;font-style:italic;font-size:13px">Disponível</td>
@@ -388,16 +416,32 @@ function renderAdmin(){
   }
 
   // unreserved grid
-  const livres=GIFTS.filter(g=>!reservas[g.id]);
+  const livres=GIFTS.filter(g=>{
+    const entries=reservas[g.id];
+    let count=0;
+    if(entries){
+      if(typeof entries==='object'&&!entries.nome) count=Object.keys(entries).length;
+      else count=1;
+    }
+    return count < g.qty;
+  });
   const sec=document.getElementById('unres-sec');
   const grid=document.getElementById('unres-grid');
   if(adminFilter==='todos'&&livres.length){
     sec.style.display='block';
     grid.innerHTML='';
     livres.forEach(g=>{
+      const entries=reservas[g.id];
+      let count=0;
+      if(entries){
+        if(typeof entries==='object'&&!entries.nome) count=Object.keys(entries).length;
+        else count=1;
+      }
+      const remaining=g.qty-count;
+      if(remaining<=0)return;
       const d=document.createElement('div');
       d.className='unres-item';
-      d.innerHTML=`<span>${g.icon}</span><span>${g.name}</span>`;
+      d.innerHTML=`<span>${g.icon}</span><span>${g.name}${g.qty>1?' <span style="opacity:.5;font-size:11px">('+remaining+' disp.)</span>':''}</span>`;
       grid.appendChild(d);
     });
   } else {
@@ -429,9 +473,11 @@ function exportCSV(){
   showToast('CSV exportado!','success');
 }
 
-function confirmDelete(id, giftName, personName){
+function confirmDelete(giftId, pushKey, giftName, personName){
   if(!confirm('Cancelar a reserva de "'+giftName+'" feita por '+personName+'?')) return;
-  db.ref('reservas/'+id).remove()
+  // If pushKey is '0' it's legacy single, remove whole node; otherwise remove just the entry
+  const path = pushKey==='0' ? 'reservas/'+giftId : 'reservas/'+giftId+'/'+pushKey;
+  db.ref(path).remove()
     .then(()=>showToast('Reserva cancelada.','info'))
     .catch(()=>showToast('Erro ao cancelar.','info'));
 }
