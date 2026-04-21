@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chá de Panela · Rozianny & Maycon</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--gold:#b8924a;--gold-l:#d4aa6a;--dark:#3b3220;--olive:#4a5c3a;--text:#5c4e38;--white:#fffdf8;--green:#3a6e47}
+  html,body{min-height:100%;background:#ede5d4;font-family:'Cormorant Garamond',serif;color:var(--text);overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse at 20% 10%,rgba(212,170,106,.13) 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(212,170,106,.10) 0%,transparent 55%),radial-gradient(ellipse at 50% 50%,#f7f2e9 0%,#ede5d4 100%)}
+  #bokeh{position:fixed;inset:0;pointer-events:none;z-index:-1}
+  .invite{max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 60px;position:relative;display:flex;flex-direction:column;align-items:center}
+
+  /* TOP BOTANICAL */
+  .bot-top{width:100%;position:relative;height:220px;flex-shrink:0}
+  .bot-top svg{width:100%;height:100%}
+
+  /* CONTENT */
+  .content{width:100%;padding:0 24px;display:flex;flex-direction:column;align-items:center}
+
+  /* BADGE */
+  .badge{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .badge-line{width:36px;height:1px;background:linear-gradient(to right,transparent,var(--gold))}
+  .badge-line.r{background:linear-gradient(to left,transparent,var(--gold))}
+  .badge-text{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+
+  /* TITLE */
+  .cha-title{font-family:'Great Vibes',cursive;font-size:52px;color:var(--olive);line-height:1;margin-bottom:2px;text-shadow:0 2px 8px rgba(74,92,58,.1);animation:fadeUp .6s .1s ease both}
+
+  /* HOUSE */
+  .house-icon{margin-bottom:8px;opacity:.72;animation:fadeUp .6s .2s ease both}
+
+  /* NAMES */
+  .names{font-family:'Great Vibes',cursive;font-size:54px;color:var(--dark);line-height:1;text-align:center;margin-bottom:10px;animation:fadeUp .6s .3s ease both}
+  .amp{color:var(--gold);font-size:44px;margin:0 4px}
+
+  /* DIVIDER */
+  .hdiv{display:flex;align-items:center;gap:12px;margin:8px 0 16px;width:100%;justify-content:center;animation:fadeUp .6s .35s ease both}
+  .hdiv-line{flex:1;max-width:80px;height:1px;background:linear-gradient(to right,transparent,rgba(184,146,74,.5))}
+  .hdiv-line.r{background:linear-gradient(to left,transparent,rgba(184,146,74,.5))}
+  .hdiv-orn{font-size:14px;color:var(--gold);line-height:1}
+
+  /* SUBTITLE */
+  .subtitle{font-size:17px;font-style:italic;color:var(--text);text-align:center;line-height:1.5;margin-bottom:22px;opacity:.9;animation:fadeUp .6s .4s ease both}
+
+  /* DATE BOX */
+  .date-box{background:rgba(255,253,248,.7);border:1px solid rgba(184,146,74,.3);border-radius:16px;padding:20px 32px;text-align:center;width:100%;margin-bottom:18px;backdrop-filter:blur(4px);box-shadow:0 4px 24px rgba(184,146,74,.08),inset 0 1px 0 rgba(255,255,255,.8);position:relative;animation:fadeUp .6s .45s ease both}
+  .date-box::before{content:'';position:absolute;inset:3px;border:1px solid rgba(184,146,74,.1);border-radius:13px;pointer-events:none}
+  .date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:7px}
+  .date-row:last-child{margin-bottom:0}
+  .date-icon{color:var(--gold);font-size:16px}
+  .date-text{font-family:'Cinzel',serif;font-size:16px;font-weight:500;color:var(--dark);letter-spacing:.5px}
+
+  /* LOCATION ROW */
+  .location-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(184,146,74,.15)}
+  .location-text{font-size:14px;font-style:italic;color:var(--text);opacity:.75}
+
+  /* COUNTDOWN */
+  .countdown{display:flex;gap:10px;justify-content:center;margin-bottom:22px;width:100%;animation:fadeUp .6s .5s ease both}
+  .cd-item{flex:1;background:rgba(255,253,248,.6);border:1px solid rgba(184,146,74,.22);border-radius:12px;padding:14px 6px 10px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+  .cd-num{font-family:'Cinzel',serif;font-size:28px;font-weight:500;color:var(--gold);line-height:1;display:block}
+  .cd-lbl{font-size:10px;letter-spacing:1.5px;color:var(--text);opacity:.65;text-transform:uppercase;display:block;margin-top:4px}
+
+  /* ESPERAMOS */
+  .esperamos{font-family:'Great Vibes',cursive;font-size:36px;color:var(--gold);text-align:center;margin-bottom:22px;text-shadow:0 2px 8px rgba(184,146,74,.2);animation:fadeUp .6s .55s ease both;animation:shimmer 3s ease-in-out infinite, fadeUp .6s .55s ease both}
+  @keyframes shimmer{0%,100%{opacity:.7}50%{opacity:1}}
+
+  /* BUTTONS */
+  .buttons{display:flex;flex-direction:column;gap:11px;width:100%;margin-bottom:30px;animation:fadeUp .6s .6s ease both}
+  .btn{display:flex;align-items:center;justify-content:center;gap:12px;padding:17px 24px;border-radius:50px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:1.5px;text-decoration:none;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:linear-gradient(135deg,#c9a55a,#b8924a,#a07838);color:#fff;box-shadow:0 4px 16px rgba(184,146,74,.35)}
+  .btn-primary:hover{box-shadow:0 8px 24px rgba(184,146,74,.45)}
+  .btn-outline{background:rgba(255,253,248,.7);color:var(--dark);border:1.5px solid rgba(184,146,74,.45);box-shadow:0 2px 10px rgba(0,0,0,.06);backdrop-filter:blur(4px)}
+  .btn-outline:hover{box-shadow:0 6px 18px rgba(0,0,0,.1)}
+  .btn-icon{width:20px;height:20px;flex-shrink:0}
+
+  /* VERSE */
+  .verse{text-align:center;padding:22px 18px;border-top:1px solid rgba(184,146,74,.18);width:100%;animation:fadeUp .6s .65s ease both}
+  .verse-text{font-size:15px;font-style:italic;line-height:1.7;opacity:.82;margin-bottom:8px}
+  .verse-ref{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold)}
+
+  /* BOT BOTTOM */
+  .bot-bottom{width:100%;height:160px;flex-shrink:0}
+  .bot-bottom svg{width:100%;height:100%}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(59,50,32,.52);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:var(--white);border-radius:24px 24px 0 0;padding:26px 22px 48px;width:100%;max-width:480px;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .m-handle{width:36px;height:4px;background:rgba(184,146,74,.28);border-radius:99px;margin:0 auto 20px}
+  .m-title{font-family:'Great Vibes',cursive;font-size:32px;color:var(--olive);text-align:center;margin-bottom:4px}
+  .m-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:var(--gold);text-align:center;margin-bottom:22px;opacity:.8}
+  .m-field{margin-bottom:13px}
+  .m-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;opacity:.6;text-transform:uppercase;display:block;margin-bottom:5px}
+  .m-input{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid rgba(184,146,74,.22);background:rgba(247,242,233,.6);font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--dark);outline:none;transition:border-color .2s,box-shadow .2s}
+  .m-input:focus{border-color:rgba(184,146,74,.55);box-shadow:0 0 0 3px rgba(184,146,74,.08)}
+  .m-input.err{border-color:rgba(200,60,60,.5)}
+  .m-input::placeholder{opacity:.38;font-style:italic}
+  .f-err{font-size:11px;color:#b03030;font-style:italic;margin-top:3px;min-height:16px;display:block}
+  .m-confirm{width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,#c9a55a,#b8924a);color:#fff;font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;cursor:pointer;margin-top:12px;box-shadow:0 4px 16px rgba(184,146,74,.32);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .m-confirm:hover:not(:disabled){transform:translateY(-1px)}
+  .m-confirm:disabled{opacity:.65;cursor:not-allowed}
+  .m-cancel{width:100%;padding:10px;border-radius:50px;border:none;background:transparent;color:var(--text);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;cursor:pointer;opacity:.45;margin-top:6px;transition:opacity .2s}
+  .m-cancel:hover{opacity:.75}
+  .btn-sp{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* SUCCESS STATE */
+  .success-state{text-align:center;padding:10px 0 20px}
+  .success-icon{font-size:48px;margin-bottom:12px;display:block}
+  .success-title{font-family:'Great Vibes',cursive;font-size:32px;color:var(--olive);margin-bottom:8px}
+  .success-msg{font-size:15px;font-style:italic;opacity:.7;line-height:1.6}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);padding:13px 22px;border-radius:50px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;z-index:200;transition:transform .4s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.18);pointer-events:none}
+  .toast.success{background:var(--green);color:#fff}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<canvas id="bokeh"></canvas>
+
+<div class="invite">
+
+  <!-- TOP BOTANICAL -->
+  <div class="bot-top">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="bgTop" cx="50%" cy="0%" r="80%">
+          <stop offset="0%" stop-color="#e8dfc8" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="#f7f2e9" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="480" height="220" fill="url(#bgTop)"/>
+      <g opacity=".85">
+        <circle cx="30" cy="60" r="28" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="30" cy="60" r="18" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="30" cy="60" r="10" fill="#d4c090"/>
+        <ellipse cx="10" cy="40" rx="12" ry="7" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(-30 10 40)"/>
+        <ellipse cx="55" cy="45" rx="11" ry="6" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(20 55 45)"/>
+        <ellipse cx="8" cy="80" rx="10" ry="6" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(-50 8 80)"/>
+        <circle cx="75" cy="30" r="18" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="75" cy="30" r="11" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="75" cy="30" r="6" fill="#d4c090"/>
+        <ellipse cx="0" cy="120" rx="22" ry="9" fill="#b5c4a0" opacity=".7" transform="rotate(-60 0 120)"/>
+        <ellipse cx="50" cy="115" rx="20" ry="8" fill="#9aad85" opacity=".65" transform="rotate(-40 50 115)"/>
+        <ellipse cx="20" cy="150" rx="18" ry="7" fill="#b5c4a0" opacity=".6" transform="rotate(-70 20 150)"/>
+        <ellipse cx="60" cy="145" rx="22" ry="8" fill="#a0b88a" opacity=".6" transform="rotate(-30 60 145)"/>
+        <path d="M15 180 Q30 140 45 100 Q55 75 75 50" stroke="#b5a87a" stroke-width="1" fill="none" opacity=".4"/>
+      </g>
+      <g opacity=".85">
+        <circle cx="450" cy="55" r="28" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="450" cy="55" r="18" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="450" cy="55" r="10" fill="#d4c090"/>
+        <ellipse cx="470" cy="35" rx="12" ry="7" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(30 470 35)"/>
+        <ellipse cx="425" cy="40" rx="11" ry="6" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(-20 425 40)"/>
+        <ellipse cx="480" cy="115" rx="22" ry="9" fill="#b5c4a0" opacity=".7" transform="rotate(60 480 115)"/>
+        <ellipse cx="430" cy="110" rx="20" ry="8" fill="#9aad85" opacity=".65" transform="rotate(40 430 110)"/>
+        <ellipse cx="460" cy="145" rx="18" ry="7" fill="#b5c4a0" opacity=".6" transform="rotate(70 460 145)"/>
+        <ellipse cx="420" cy="140" rx="22" ry="8" fill="#a0b88a" opacity=".6" transform="rotate(30 420 140)"/>
+        <path d="M465 175 Q450 138 435 100 Q425 75 405 52" stroke="#b5a87a" stroke-width="1" fill="none" opacity=".4"/>
+      </g>
+      <g opacity=".75">
+        <path d="M100 0 Q120 30 140 20 Q160 10 180 35 Q200 50 220 30 Q240 10 260 30 Q280 50 300 35 Q320 10 340 20 Q360 30 380 0" stroke="#9aad85" stroke-width="1.5" fill="none"/>
+        <ellipse cx="140" cy="22" rx="8" ry="4" fill="#b5c4a0" opacity=".8" transform="rotate(-10 140 22)"/>
+        <ellipse cx="180" cy="37" rx="7" ry="3.5" fill="#9aad85" opacity=".8" transform="rotate(15 180 37)"/>
+        <ellipse cx="220" cy="32" rx="8" ry="4" fill="#b5c4a0" opacity=".8" transform="rotate(-5 220 32)"/>
+        <ellipse cx="260" cy="32" rx="7" ry="3.5" fill="#9aad85" opacity=".8" transform="rotate(5 260 32)"/>
+        <ellipse cx="300" cy="37" rx="8" ry="4" fill="#b5c4a0" opacity=".8" transform="rotate(-15 300 37)"/>
+        <ellipse cx="340" cy="22" rx="7" ry="3.5" fill="#9aad85" opacity=".8" transform="rotate(10 340 22)"/>
+        <circle cx="130" cy="16" r="2.5" fill="#f5e08a" opacity=".9"/>
+        <circle cx="170" cy="28" r="2" fill="#f5e08a" opacity=".8"/>
+        <circle cx="210" cy="18" r="2.5" fill="#f5e08a" opacity=".9"/>
+        <circle cx="250" cy="18" r="2" fill="#f5e08a" opacity=".8"/>
+        <circle cx="290" cy="28" r="2.5" fill="#f5e08a" opacity=".9"/>
+        <circle cx="330" cy="16" r="2" fill="#f5e08a" opacity=".8"/>
+        <circle cx="130" cy="16" r="6" fill="#f5e08a" opacity=".2"/>
+        <circle cx="210" cy="18" r="6" fill="#f5e08a" opacity=".2"/>
+        <circle cx="290" cy="28" r="6" fill="#f5e08a" opacity=".2"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="badge">
+      <div class="badge-line"></div>
+      <span class="badge-text">convite especial</span>
+      <div class="badge-line r"></div>
+    </div>
+
+    <div class="cha-title">Chá de panela</div>
+
+    <div class="house-icon">
+      <svg width="32" height="26" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2 L30 14 L26 14 L26 24 L20 24 L20 17 L12 17 L12 24 L6 24 L6 14 L2 14 Z" stroke="#b8924a" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="names">
+      Rozianny <span class="amp">♡</span> Maycon
+    </div>
+
+    <div class="hdiv">
+      <div class="hdiv-line"></div>
+      <span class="hdiv-orn">✦</span>
+      <span class="hdiv-orn" style="color:var(--olive);font-size:11px">✿</span>
+      <span class="hdiv-orn">✦</span>
+      <div class="hdiv-line r"></div>
+    </div>
+
+    <p class="subtitle">
+      Você é nosso convidado especial!<br>
+      <span style="font-size:15px;opacity:.75">Nosso grande dia está chegando e<br>queremos celebrar com você.</span>
+    </p>
+
+    <div class="date-box">
+      <div class="date-row">
+        <span class="date-icon">🗓</span>
+        <span class="date-text">10 de Maio de 2026</span>
+      </div>
+      <div class="date-row">
+        <span class="date-icon">🕑</span>
+        <span class="date-text">Às 14 horas</span>
+      </div>
+      <div class="location-row">
+        <span class="date-icon">📍</span>
+        <span class="location-text">Lote São José · Vicinal 22 · Casa da Dona Dora</span>
+      </div>
+    </div>
+
+    <div class="countdown" id="countdown">
+      <div class="cd-item"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Dias</span></div>
+      <div class="cd-item"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Horas</span></div>
+      <div class="cd-item"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Min</span></div>
+      <div class="cd-item"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Seg</span></div>
+    </div>
+
+    <div class="esperamos">Esperamos por você!</div>
+
+    <div class="buttons">
+      <!-- LISTA DE PRESENTES -->
+      <a href="lista.html" class="btn btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.51 15.86.5 13.5.5c-1.3 0-2.51.6-3.5 1.55C9.01 1.1 7.8.5 6.5.5 4.14.5 2 2.51 2 4.64c0 .48.11.92.18 1.36H0v2h1v13h22V8h1V6h-4zm-8.5 12H4V8h7.5v10zm9.5 0h-7.5V8H21v10z" fill="#b8924a"/>
+        </svg>
+        Lista de Presentes
+      </a>
+
+      <!-- CONFIRMAR PRESENÇA -->
+      <button class="btn btn-outline" onclick="openPresenca()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#b8924a"/>
+        </svg>
+        Confirmar Presença
+      </button>
+    </div>
+
+    <div class="verse">
+      <p class="verse-text">
+        "E, sobre tudo isto, revesti-vos de amor,<br>
+        que é o vínculo da perfeição."
+      </p>
+      <span class="verse-ref">Colossenses 3:14</span>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BOTANICAL -->
+  <div class="bot-bottom">
+    <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <g opacity=".8">
+        <circle cx="40" cy="110" r="32" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="40" cy="110" r="20" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="40" cy="110" r="11" fill="#d4c090"/>
+        <ellipse cx="15" cy="90" rx="13" ry="7" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(-25 15 90)"/>
+        <ellipse cx="65" cy="95" rx="12" ry="6" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(15 65 95)"/>
+        <circle cx="90" cy="145" r="18" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="90" cy="145" r="11" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="90" cy="145" r="6" fill="#d4c090"/>
+        <ellipse cx="10" cy="50" rx="20" ry="8" fill="#b5c4a0" opacity=".7" transform="rotate(-65 10 50)"/>
+        <ellipse cx="55" cy="55" rx="18" ry="7" fill="#9aad85" opacity=".65" transform="rotate(-40 55 55)"/>
+      </g>
+      <g opacity=".8">
+        <circle cx="440" cy="110" r="32" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="440" cy="110" r="20" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="440" cy="110" r="11" fill="#d4c090"/>
+        <ellipse cx="465" cy="90" rx="13" ry="7" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(25 465 90)"/>
+        <ellipse cx="415" cy="95" rx="12" ry="6" fill="#f0ede0" stroke="#c5ba95" stroke-width=".5" transform="rotate(-15 415 95)"/>
+        <circle cx="390" cy="145" r="18" fill="#f5f0e5" stroke="#d4c5a0" stroke-width=".5"/>
+        <circle cx="390" cy="145" r="11" fill="#ede0c4" stroke="#c8b480" stroke-width=".5"/>
+        <circle cx="390" cy="145" r="6" fill="#d4c090"/>
+        <ellipse cx="470" cy="50" rx="20" ry="8" fill="#b5c4a0" opacity=".7" transform="rotate(65 470 50)"/>
+        <ellipse cx="425" cy="55" rx="18" ry="7" fill="#9aad85" opacity=".65" transform="rotate(40 425 55)"/>
+      </g>
+    </svg>
+  </div>
+
+</div>
+
+<!-- MODAL CONFIRMAR PRESENÇA -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="m-handle"></div>
+
+    <!-- FORM STATE -->
+    <div id="form-state">
+      <div class="m-title">Confirmar Presença</div>
+      <div class="m-sub">Rozianny & Maycon · 10 de Maio de 2026</div>
+
+      <div class="m-field">
+        <label class="m-label">Nome *</label>
+        <input type="text" class="m-input" id="p-nome" placeholder="Seu nome completo" maxlength="80" autocomplete="name"/>
+        <span class="f-err" id="e-nome"></span>
+      </div>
+      <div class="m-field">
+        <label class="m-label">Número de pessoas *</label>
+        <input type="number" class="m-input" id="p-qtd" placeholder="Ex: 2" min="1" max="20" style="text-align:center"/>
+        <span class="f-err" id="e-qtd"></span>
+      </div>
+      <div class="m-field">
+        <label class="m-label">Telefone (opcional)</label>
+        <input type="tel" class="m-input" id="p-tel" placeholder="(00) 00000-0000" maxlength="20" autocomplete="tel"/>
+      </div>
+      <div class="m-field">
+        <label class="m-label">Mensagem (opcional)</label>
+        <input type="text" class="m-input" id="p-msg" placeholder="Uma mensagem carinhosa..." maxlength="120"/>
+      </div>
+
+      <button class="m-confirm" id="p-btn" onclick="confirmarPresenca()">
+        <span id="p-btn-txt">Confirmar Presença</span>
+      </button>
+      <button class="m-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div id="success-state" class="success-state" style="display:none">
+      <span class="success-icon">🌿</span>
+      <div class="success-title">Presença confirmada!</div>
+      <p class="success-msg">Que alegria! Rozianny e Maycon<br>estão ansiosos para te ver. ♡</p>
+      <button class="m-confirm" style="margin-top:24px" onclick="closeModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBOTxdo4RB3ELM-tg0wlTAR0OCPQXvWyhY",
+  authDomain:"cha-de-panela-rea.firebaseapp.com",
+  databaseURL:"https://cha-de-panela-rea-default-rtdb.firebaseio.com",
+  projectId:"cha-de-panela-rea",
+  storageBucket:"cha-de-panela-rea.firebasestorage.app",
+  messagingSenderId:"798211029201",
+  appId:"1:798211029201:web:9943fa71c440aaa89a2df0"
+});
+const db = firebase.database();
+
+// ── COUNTDOWN ──
+(function(){
+  const target=new Date('2026-05-10T14:00:00');
+  function pad(n){return String(n).padStart(2,'0');}
+  function tick(){
+    const diff=target-new Date();
+    if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(id=>document.getElementById(id).textContent='00');return;}
+    document.getElementById('cd-d').textContent=pad(Math.floor(diff/86400000));
+    document.getElementById('cd-h').textContent=pad(Math.floor(diff%86400000/3600000));
+    document.getElementById('cd-m').textContent=pad(Math.floor(diff%3600000/60000));
+    document.getElementById('cd-s').textContent=pad(Math.floor(diff%60000/1000));
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+// ── MODAL ──
+function openPresenca(){
+  ['p-nome','p-qtd','p-tel','p-msg'].forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('err');});
+  ['e-nome','e-qtd'].forEach(id=>document.getElementById(id).textContent='');
+  document.getElementById('form-state').style.display='block';
+  document.getElementById('success-state').style.display='none';
+  setBtnState(false);
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-overlay').onclick=e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();};
+  setTimeout(()=>document.getElementById('p-nome').focus(),380);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function setBtnState(loading){
+  const btn=document.getElementById('p-btn'),txt=document.getElementById('p-btn-txt');
+  btn.disabled=loading; txt.textContent=loading?'Salvando...':'Confirmar Presença';
+  const sp=btn.querySelector('.btn-sp');
+  if(loading&&!sp){const d=document.createElement('div');d.className='btn-sp';btn.insertBefore(d,txt);}
+  if(!loading&&sp)sp.remove();
+}
+
+async function confirmarPresenca(){
+  const nome=document.getElementById('p-nome').value.trim();
+  const qtd=parseInt(document.getElementById('p-qtd').value)||0;
+  const tel=document.getElementById('p-tel').value.trim();
+  const msg=document.getElementById('p-msg').value.trim();
+
+  let ok=true;
+  if(!nome){document.getElementById('p-nome').classList.add('err');document.getElementById('e-nome').textContent='Informe seu nome';ok=false;}
+  else{document.getElementById('p-nome').classList.remove('err');document.getElementById('e-nome').textContent='';}
+  if(qtd<1){document.getElementById('p-qtd').classList.add('err');document.getElementById('e-qtd').textContent='Informe quantas pessoas virão';ok=false;}
+  else{document.getElementById('p-qtd').classList.remove('err');document.getElementById('e-qtd').textContent='';}
+  if(!ok)return;
+
+  setBtnState(true);
+  try{
+    await db.ref('presencas').push({nome,pessoas:qtd,telefone:tel||null,msg:msg||null,timestamp:new Date().toISOString()});
+    document.getElementById('form-state').style.display='none';
+    document.getElementById('success-state').style.display='block';
+  }catch(e){
+    showToast('Erro ao salvar. Tente novamente.');
+  }
+  setBtnState(false);
+}
+
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  clearTimeout(toastT); t.textContent=msg; t.className='toast success show';
+  toastT=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ── BOKEH ──
+(function(){
+  const c=document.getElementById('bokeh'),ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  const cols=['rgba(245,224,138,','rgba(212,170,106,','rgba(255,248,210,'];
+  function P(){this.reset();this.y=Math.random()*c.height;}
+  P.prototype.reset=function(){this.x=Math.random()*c.width;this.y=c.height+10;this.r=Math.random()*2.5+1;this.a=Math.random()*.3+.04;this.s=Math.random()*.22+.05;this.col=cols[Math.floor(Math.random()*cols.length)];this.d=(Math.random()-.5)*.12;this.p=Math.random()*Math.PI*2;this.ps=Math.random()*.012+.004;};
+  P.prototype.tick=function(){this.y-=this.s;this.x+=this.d;this.p+=this.ps;const ca=this.a*(0.65+0.35*Math.sin(this.p));const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*2.2);g.addColorStop(0,this.col+ca+')');g.addColorStop(1,this.col+'0)');ctx.beginPath();ctx.fillStyle=g;ctx.arc(this.x,this.y,this.r*2.2,0,Math.PI*2);ctx.fill();if(this.y<-10)this.reset();};
+  const ps=Array.from({length:50},()=>new P());
+  function loop(){ctx.clearRect(0,0,c.width,c.height);ps.forEach(p=>p.tick());requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>

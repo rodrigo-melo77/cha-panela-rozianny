@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Presentes · Rozianny & Maycon</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--gold:#b8924a;--gold-l:#d4aa6a;--dark:#3b3220;--olive:#4a5c3a;--text:#5c4e38;--white:#fffdf8;--green:#3a6e47;--green-bg:rgba(212,237,218,.5);--green-bd:rgba(124,185,138,.4)}
+  html,body{min-height:100%;background:#ede5d4;font-family:'Cormorant Garamond',serif;color:var(--text);overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 40%,#f7f2e9 0%,#ede5d4 100%)}
+  #bokeh{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .page{max-width:480px;margin:0 auto;padding:0 0 70px;position:relative;z-index:1}
+
+  /* HEADER */
+  .header{text-align:center;padding:34px 20px 14px}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold);text-decoration:none;margin-bottom:18px;opacity:.8;transition:opacity .2s}
+  .back-btn:hover{opacity:1}
+  .eyebrow{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px}
+  .eyebrow span{width:28px;height:1px;background:var(--gold);opacity:.4;display:block}
+  .h-title{font-family:'Great Vibes',cursive;font-size:44px;color:var(--olive);margin-bottom:2px;line-height:1.1}
+  .h-names{font-size:14px;font-style:italic;opacity:.65;margin-bottom:14px}
+
+  /* BANNER */
+  .banner{margin:0 14px 12px;padding:9px 16px;border-radius:12px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-align:center;display:none}
+  .banner.offline{background:rgba(180,100,30,.12);border:1px solid rgba(180,100,30,.25);color:#8a5a20;display:block}
+
+  /* PROGRESS */
+  .prog-box{background:rgba(255,253,248,.75);border:1px solid rgba(184,146,74,.2);border-radius:16px;padding:15px 18px;margin:0 14px 14px;backdrop-filter:blur(4px);box-shadow:0 2px 14px rgba(0,0,0,.05)}
+  .prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+  .prog-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;opacity:.65;text-transform:uppercase}
+  .prog-cnt{font-family:'Cinzel',serif;font-size:12px;color:var(--gold)}
+  .prog-bar{height:6px;background:rgba(184,146,74,.13);border-radius:99px;overflow:hidden}
+  .prog-fill{height:100%;background:linear-gradient(90deg,#c9a55a,#b8924a);border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+  /* TABS */
+  .tabs{display:flex;gap:8px;padding:0 14px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex-shrink:0;padding:7px 14px;border-radius:50px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1.5px solid rgba(184,146,74,.28);background:rgba(255,253,248,.5);color:var(--text);transition:all .2s;white-space:nowrap}
+  .tab.active{background:linear-gradient(135deg,#c9a55a,#b8924a);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(184,146,74,.28)}
+
+  /* LOADING */
+  .loading-state{text-align:center;padding:50px 20px}
+  .spinner{width:30px;height:30px;border:2px solid rgba(184,146,74,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-txt{font-size:14px;font-style:italic;opacity:.6}
+
+  /* LIST */
+  .list{padding:0 10px;display:flex;flex-direction:column;gap:9px}
+  .empty-cat{text-align:center;padding:40px 20px;font-style:italic;opacity:.5;font-size:15px}
+
+  /* CARD */
+  .gift-card{background:rgba(255,253,248,.78);border:1px solid rgba(184,146,74,.18);border-radius:14px;padding:14px 15px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .gift-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,#c9a55a,#b8924a);opacity:0;transition:opacity .25s}
+  .gift-card:not(.reserved):hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+  .gift-card:not(.reserved):hover::before{opacity:1}
+  .gift-card.reserved{background:var(--green-bg);border-color:var(--green-bd);cursor:default}
+  .gift-card.reserved::before{background:linear-gradient(to bottom,#7cb98a,#5a9e6e);opacity:1}
+
+  .g-icon{width:40px;height:40px;border-radius:11px;background:rgba(184,146,74,.1);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+  .gift-card.reserved .g-icon{background:rgba(124,185,138,.18)}
+  .g-info{flex:1;min-width:0}
+  .g-name{font-size:15px;font-weight:500;color:var(--dark);line-height:1.2;margin-bottom:1px}
+  .gift-card.reserved .g-name{color:#2e5c3a}
+  .g-meta{font-size:12px;font-style:italic;opacity:.55}
+  .g-by{font-size:12px;color:var(--green);margin-top:2px}
+  .g-action{flex-shrink:0}
+
+  .reserve-btn{padding:8px 14px;border-radius:50px;border:1.5px solid rgba(184,146,74,.38);background:transparent;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap}
+  .reserve-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .res-badge{display:flex;align-items:center;gap:4px;padding:8px 10px;border-radius:50px;background:rgba(90,158,110,.13);border:1.5px solid var(--green-bd);font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--green);white-space:nowrap}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(59,50,32,.52);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:var(--white);border-radius:24px 24px 0 0;padding:26px 22px 48px;width:100%;max-width:480px;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .m-handle{width:36px;height:4px;background:rgba(184,146,74,.28);border-radius:99px;margin:0 auto 20px}
+  .m-title{font-family:'Great Vibes',cursive;font-size:30px;color:var(--olive);text-align:center;margin-bottom:3px}
+  .m-item{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;color:var(--gold);text-align:center;margin-bottom:20px;text-transform:uppercase}
+  .m-row{display:flex;gap:10px}
+  .m-field{flex:1;margin-bottom:14px}
+  .m-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;opacity:.6;text-transform:uppercase;display:block;margin-bottom:5px}
+  .m-input{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid rgba(184,146,74,.22);background:rgba(247,242,233,.6);font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--dark);outline:none;transition:border-color .2s,box-shadow .2s}
+  .m-input:focus{border-color:rgba(184,146,74,.55);box-shadow:0 0 0 3px rgba(184,146,74,.08)}
+  .m-input.err{border-color:rgba(200,60,60,.5);box-shadow:0 0 0 3px rgba(200,60,60,.07)}
+  .m-input::placeholder{opacity:.38;font-style:italic}
+  .f-err{font-size:11px;color:#b03030;font-style:italic;margin-top:3px;min-height:16px;display:block}
+  .m-confirm{width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,#c9a55a,#b8924a);color:#fff;font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;cursor:pointer;margin-top:14px;box-shadow:0 4px 16px rgba(184,146,74,.32);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .m-confirm:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(184,146,74,.42)}
+  .m-confirm:disabled{opacity:.65;cursor:not-allowed}
+  .btn-sp{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  .m-cancel{width:100%;padding:10px;border-radius:50px;border:none;background:transparent;color:var(--text);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;cursor:pointer;opacity:.45;margin-top:6px;transition:opacity .2s}
+  .m-cancel:hover{opacity:.75}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);padding:13px 22px;border-radius:50px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;z-index:200;transition:transform .4s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.18);pointer-events:none}
+  .toast.success{background:#3a6e47;color:#fff}
+  .toast.error{background:#7a2a2a;color:#fff}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .footer{text-align:center;padding:28px 20px 0}
+  .footer-orn{font-family:'Great Vibes',cursive;font-size:22px;color:var(--gold);opacity:.6}
+</style>
+</head>
+<body>
+<canvas id="bokeh"></canvas>
+<div class="page">
+  <div class="header">
+    <a href="index.html" class="back-btn">← Voltar ao Convite</a>
+    <div class="eyebrow"><span></span>Chá de Panela<span></span></div>
+    <div class="h-title">Lista de Presentes</div>
+    <div class="h-names">Rozianny & Maycon · 10 de Maio de 2026</div>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="prog-box">
+    <div class="prog-head">
+      <span class="prog-lbl">Presentes reservados</span>
+      <span class="prog-cnt" id="prog-cnt">—</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="filterCat('todos',this)">Todos</div>
+    <div class="tab" onclick="filterCat('cozinha',this)">🍳 Cozinha</div>
+    <div class="tab" onclick="filterCat('cama',this)">🛏 Cama & Banho</div>
+    <div class="tab" onclick="filterCat('casa',this)">🏠 Casa</div>
+  </div>
+
+  <div id="loading-state" class="loading-state"><div class="spinner"></div><div class="load-txt">Carregando lista...</div></div>
+  <div class="list" id="gift-list" style="display:none"></div>
+  <div class="footer"><div class="footer-orn">Rozianny & Maycon ♡</div></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Reservar presente</div>
+    <div class="m-item" id="m-item-name">—</div>
+    <div class="m-row">
+      <div class="m-field">
+        <label class="m-label">Nome *</label>
+        <input type="text" class="m-input" id="f-nome" placeholder="Seu nome" maxlength="40" autocomplete="given-name"/>
+        <span class="f-err" id="e-nome"></span>
+      </div>
+      <div class="m-field">
+        <label class="m-label">Sobrenome *</label>
+        <input type="text" class="m-input" id="f-sob" placeholder="Sobrenome" maxlength="40" autocomplete="family-name"/>
+        <span class="f-err" id="e-sob"></span>
+      </div>
+    </div>
+    <div class="m-field">
+      <label class="m-label">E-mail *</label>
+      <input type="email" class="m-input" id="f-email" placeholder="seu@email.com" maxlength="100" autocomplete="email"/>
+      <span class="f-err" id="e-email"></span>
+    </div>
+    <div class="m-field">
+      <label class="m-label">Mensagem (opcional)</label>
+      <input type="text" class="m-input" id="f-msg" placeholder="Uma mensagem para o casal..." maxlength="120"/>
+    </div>
+    <button class="m-confirm" id="m-btn" onclick="confirmReserve()">
+      <span id="m-btn-txt">Confirmar Reserva</span>
+    </button>
+    <button class="m-cancel" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBOTxdo4RB3ELM-tg0wlTAR0OCPQXvWyhY",
+  authDomain:"cha-de-panela-rea.firebaseapp.com",
+  databaseURL:"https://cha-de-panela-rea-default-rtdb.firebaseio.com",
+  projectId:"cha-de-panela-rea",
+  storageBucket:"cha-de-panela-rea.firebasestorage.app",
+  messagingSenderId:"798211029201",
+  appId:"1:798211029201:web:9943fa71c440aaa89a2df0"
+});
+const db = firebase.database();
+
+const GIFTS = [
+  {id:1,name:'Liquidificador',qty:1,cat:'cozinha',icon:'🫙'},
+  {id:2,name:'Sanduicheira',qty:1,cat:'cozinha',icon:'🥪'},
+  {id:3,name:'Jogo de Copo',qty:5,cat:'cozinha',icon:'🥛'},
+  {id:4,name:'Jogo de Xícara',qty:3,cat:'cozinha',icon:'☕'},
+  {id:5,name:'Jogo de Talher',qty:2,cat:'cozinha',icon:'🍴'},
+  {id:6,name:'Jogo de Colher Grande',qty:5,cat:'cozinha',icon:'🥄'},
+  {id:7,name:'Jogo de Cama',qty:1,cat:'cama',icon:'🛏'},
+  {id:8,name:'Lençol',qty:5,cat:'cama',icon:'🛏'},
+  {id:9,name:'Frigideira',qty:3,cat:'cozinha',icon:'🍳'},
+  {id:10,name:'Panela de Pressão',qty:2,cat:'cozinha',icon:'⚡'},
+  {id:11,name:'Panela Comum',qty:5,cat:'cozinha',icon:'🍲'},
+  {id:12,name:'Kit Pano de Prato',qty:1,cat:'cozinha',icon:'🧺'},
+  {id:13,name:'Triturador de Alho',qty:1,cat:'cozinha',icon:'🧄'},
+  {id:14,name:'Faca',qty:3,cat:'cozinha',icon:'🔪'},
+  {id:15,name:'Escorredor de Macarrão',qty:1,cat:'cozinha',icon:'🍝'},
+  {id:16,name:'Forma',qty:4,cat:'cozinha',icon:'🧁'},
+  {id:17,name:'Escorredor de Prato',qty:1,cat:'cozinha',icon:'🍽'},
+  {id:18,name:'Jarra',qty:4,cat:'cozinha',icon:'🫗'},
+  {id:19,name:'Porta Mantimento',qty:1,cat:'cozinha',icon:'🫙'},
+  {id:20,name:'Jogo de Prato',qty:2,cat:'cozinha',icon:'🍽'},
+  {id:21,name:'Leiteira',qty:2,cat:'cozinha',icon:'🥛'},
+  {id:22,name:'Garrafa de Café',qty:1,cat:'cozinha',icon:'☕'},
+  {id:23,name:'Cuscuzeira',qty:1,cat:'cozinha',icon:'🫕'},
+  {id:24,name:'Toalha de Banho',qty:2,cat:'cama',icon:'🛁'},
+  {id:25,name:'Jogo de Prato (2º)',qty:2,cat:'cozinha',icon:'🍽'},
+  {id:26,name:'Assadeira',qty:4,cat:'cozinha',icon:'🥘'},
+  {id:27,name:'Fruteira',qty:1,cat:'casa',icon:'🍎'},
+  {id:28,name:'Jogo de Bacia',qty:1,cat:'casa',icon:'🪣'},
+  {id:29,name:'Ferro de Passar',qty:1,cat:'casa',icon:'👔'},
+  {id:30,name:'Cortina de Janela',qty:4,cat:'casa',icon:'🪟'},
+];
+
+let reservas={}, currentCat='todos', currentGiftId=null, loaded=false;
+
+// Connectivity
+db.ref('.info/connected').on('value', snap => {
+  const b = document.getElementById('banner');
+  if(!loaded) return;
+  if(snap.val()){b.className='banner';b.textContent='';}
+  else{b.className='banner offline';b.textContent='⚠ Sem conexão — dados podem estar desatualizados';}
+});
+
+// Realtime listener
+db.ref('reservas').on('value', snap => {
+  reservas = snap.val()||{};
+  loaded=true;
+  document.getElementById('loading-state').style.display='none';
+  document.getElementById('gift-list').style.display='flex';
+  renderList(currentCat);
+}, () => {
+  document.getElementById('loading-state').innerHTML='<div class="load-txt" style="color:#a03030">Erro ao carregar. Verifique sua conexão.</div>';
+});
+
+function renderList(cat){
+  const container=document.getElementById('gift-list');
+  container.innerHTML='';
+  const filtered=cat==='todos'?GIFTS:GIFTS.filter(g=>g.cat===cat);
+  if(!filtered.length){container.innerHTML='<div class="empty-cat">Nenhum item nesta categoria.</div>';return;}
+
+  // Available first, reserved last
+  const sorted=[...filtered].sort((a,b)=>(!!reservas[a.id])-(!!reservas[b.id]));
+
+  sorted.forEach((g,i)=>{
+    const r=reservas[g.id];
+    const isRes=!!r;
+    const card=document.createElement('div');
+    card.className='gift-card'+(isRes?' reserved':'');
+    card.style.animationDelay=(i*.03)+'s';
+    card.innerHTML=`
+      <div class="g-icon">${g.icon}</div>
+      <div class="g-info">
+        <div class="g-name">${g.name}</div>
+        ${g.qty>1?`<div class="g-meta">Quantidade desejada: ${g.qty}</div>`:''}
+        ${isRes?`<div class="g-by">✓ Reservado por ${r.nome} ${r.sobrenome}</div>`:''}
+      </div>
+      <div class="g-action">
+        ${isRes
+          ?'<div class="res-badge">✓ Reservado</div>'
+          :`<button class="reserve-btn" onclick="openModal(${g.id},'${g.name.replace(/'/g,"\\'")}')">Reservar</button>`}
+      </div>`;
+    container.appendChild(card);
+  });
+
+  const done=Object.keys(reservas).length, total=GIFTS.length;
+  document.getElementById('prog-cnt').textContent=done+' de '+total;
+  document.getElementById('prog-fill').style.width=Math.round(done/total*100)+'%';
+}
+
+function filterCat(cat,el){
+  currentCat=cat;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderList(cat);
+}
+
+function openModal(id,name){
+  if(reservas[id]){showToast('Este presente já foi reservado!','error');return;}
+  currentGiftId=id;
+  document.getElementById('m-item-name').textContent=name;
+  ['f-nome','f-sob','f-email','f-msg'].forEach(fid=>{const el=document.getElementById(fid);el.value='';el.classList.remove('err');});
+  ['e-nome','e-sob','e-email'].forEach(eid=>document.getElementById(eid).textContent='');
+  setBtnState(false);
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-overlay').onclick=e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();};
+  setTimeout(()=>document.getElementById('f-nome').focus(),380);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentGiftId=null;
+}
+
+function setBtnState(loading){
+  const btn=document.getElementById('m-btn'), txt=document.getElementById('m-btn-txt');
+  btn.disabled=loading;
+  txt.textContent=loading?'Salvando...':'Confirmar Reserva';
+  const sp=btn.querySelector('.btn-sp');
+  if(loading&&!sp){const d=document.createElement('div');d.className='btn-sp';btn.insertBefore(d,txt);}
+  if(!loading&&sp)sp.remove();
+}
+
+function valEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);}
+
+async function confirmReserve(){
+  const nome=document.getElementById('f-nome').value.trim();
+  const sob=document.getElementById('f-sob').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const msg=document.getElementById('f-msg').value.trim();
+
+  let ok=true;
+  const setE=(fi,ei,m)=>{document.getElementById(fi).classList.add('err');document.getElementById(ei).textContent=m;ok=false;};
+  const clrE=(fi,ei)=>{document.getElementById(fi).classList.remove('err');document.getElementById(ei).textContent='';};
+
+  !nome?setE('f-nome','e-nome','Informe seu nome'):clrE('f-nome','e-nome');
+  !sob?setE('f-sob','e-sob','Informe o sobrenome'):clrE('f-sob','e-sob');
+  !valEmail(email)?setE('f-email','e-email','E-mail inválido'):clrE('f-email','e-email');
+  if(!ok)return;
+
+  setBtnState(true);
+  const giftId=currentGiftId;
+  const giftName=GIFTS.find(g=>g.id===giftId)?.name||'';
+
+  try{
+    const result=await new Promise((resolve,reject)=>{
+      db.ref('reservas/'+giftId).transaction(current=>{
+        if(current!==null)return undefined; // abort — already taken
+        return{nome,sobrenome:sob,email,msg,presente:giftName,timestamp:new Date().toISOString()};
+      },(error,committed)=>{
+        if(error)reject(error);else resolve(committed);
+      });
+    });
+
+    closeModal();
+    if(result){showToast('✓ Presente reservado com carinho!','success');}
+    else{showToast('Esse presente acabou de ser reservado por outra pessoa!','error');}
+  }catch(err){
+    console.error(err);
+    showToast('Erro de conexão. Tente novamente.','error');
+  }
+  setBtnState(false);
+}
+
+let toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  clearTimeout(toastTimer);
+  t.textContent=msg; t.className='toast '+type+' show';
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+}
+
+// Bokeh
+(function(){
+  const c=document.getElementById('bokeh'),ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  const cols=['rgba(245,224,138,','rgba(212,170,106,','rgba(255,248,210,'];
+  function P(){this.reset();this.y=Math.random()*c.height;}
+  P.prototype.reset=function(){this.x=Math.random()*c.width;this.y=c.height+10;this.r=Math.random()*2.5+1;this.a=Math.random()*.3+.04;this.s=Math.random()*.22+.05;this.col=cols[Math.floor(Math.random()*cols.length)];this.d=(Math.random()-.5)*.12;this.p=Math.random()*Math.PI*2;this.ps=Math.random()*.012+.004;};
+  P.prototype.tick=function(){this.y-=this.s;this.x+=this.d;this.p+=this.ps;const ca=this.a*(0.65+0.35*Math.sin(this.p));const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*2.2);g.addColorStop(0,this.col+ca+')');g.addColorStop(1,this.col+'0)');ctx.beginPath();ctx.fillStyle=g;ctx.arc(this.x,this.y,this.r*2.2,0,Math.PI*2);ctx.fill();if(this.y<-10)this.reset();};
+  const ps=Array.from({length:38},()=>new P());
+  function loop(){ctx.clearRect(0,0,c.width,c.height);ps.forEach(p=>p.tick());requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>
