@@ -70,6 +70,7 @@
 
   .reserve-btn{padding:8px 14px;border-radius:50px;border:1.5px solid rgba(184,146,74,.38);background:transparent;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap}
   .reserve-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .reserve-btn.partial{border-color:rgba(184,146,74,.6);color:var(--gold)}
   .res-badge{display:flex;align-items:center;gap:4px;padding:8px 10px;border-radius:50px;background:rgba(90,158,110,.13);border:1.5px solid var(--green-bd);font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--green);white-space:nowrap}
 
   /* MODAL */
@@ -103,6 +104,34 @@
 
   .footer{text-align:center;padding:28px 20px 0}
   .footer-orn{font-family:'Great Vibes',cursive;font-size:22px;color:var(--gold);opacity:.6}
+
+  @media(max-width:520px){
+    .page{padding:0 0 60px}
+    .h-title{font-size:38px}
+    .h-names{font-size:13px}
+    .prog-box{margin:0 10px 14px}
+    .tabs{padding:0 10px;gap:6px}
+    .tab{padding:6px 11px;font-size:9px}
+    .list{padding:0 8px;gap:8px}
+
+    /* CARD mobile */
+    .gift-card{padding:13px 12px;gap:10px;border-radius:12px}
+    .g-icon{width:36px;height:36px;font-size:17px;border-radius:9px;flex-shrink:0}
+    .g-name{font-size:14px}
+    .g-meta{font-size:11px}
+    .g-by{font-size:11px}
+
+    /* Botão Reservar — fica menor e cabe bem */
+    .reserve-btn{padding:7px 11px;font-size:8.5px;letter-spacing:.8px;white-space:nowrap}
+    .res-badge{padding:7px 9px;font-size:8px;letter-spacing:.8px;white-space:nowrap}
+
+    /* Progress */
+    .prog-cnt{font-size:11px}
+    .prog-lbl{font-size:8px}
+
+    /* Banner */
+    .banner{margin:0 10px 10px;font-size:9px}
+  }
 </style>
 </head>
 <body>
@@ -220,6 +249,7 @@ const GIFTS = [
   {id:30,name:'Cortina de Janela',qty:4,cat:'casa',icon:'🪟'},
 ];
 
+// reservas[giftId] = { pushKey: {nome, sobrenome, ...}, ... }
 let reservas={}, currentCat='todos', currentGiftId=null, loaded=false;
 
 // Connectivity
@@ -241,39 +271,78 @@ db.ref('reservas').on('value', snap => {
   document.getElementById('loading-state').innerHTML='<div class="load-txt" style="color:#a03030">Erro ao carregar. Verifique sua conexão.</div>';
 });
 
+// ── helpers ──
+function getReservas(giftId) {
+  // Returns array of reservations for this gift
+  const data = reservas[giftId];
+  if (!data) return [];
+  return Object.values(data);
+}
+
+function getCount(giftId) {
+  const data = reservas[giftId];
+  if (!data) return 0;
+  return Object.keys(data).length;
+}
+
+// ── RENDER ──
 function renderList(cat){
   const container=document.getElementById('gift-list');
   container.innerHTML='';
   const filtered=cat==='todos'?GIFTS:GIFTS.filter(g=>g.cat===cat);
   if(!filtered.length){container.innerHTML='<div class="empty-cat">Nenhum item nesta categoria.</div>';return;}
 
-  // Available first, reserved last
-  const sorted=[...filtered].sort((a,b)=>(!!reservas[a.id])-(!!reservas[b.id]));
+  // Sort: available/partial first, fully reserved last
+  const sorted=[...filtered].sort((a,b)=>{
+    const aFull = getCount(a.id) >= a.qty;
+    const bFull = getCount(b.id) >= b.qty;
+    return aFull - bFull;
+  });
 
   sorted.forEach((g,i)=>{
-    const r=reservas[g.id];
-    const isRes=!!r;
+    const count = getCount(g.id);
+    const isFull = count >= g.qty;
+    const lista = getReservas(g.id);
+
     const card=document.createElement('div');
-    card.className='gift-card'+(isRes?' reserved':'');
+    card.className='gift-card'+(isFull?' reserved':'');
     card.style.animationDelay=(i*.03)+'s';
+
+    // Names of who reserved
+    const nomes = lista.map(r => r.nome + (r.sobrenome ? ' '+r.sobrenome : '')).join(', ');
+
+    // Qty indicator
+    let qtyHtml = '';
+    if(g.qty > 1) {
+      qtyHtml = `<div class="g-meta">${count} de ${g.qty} reservados</div>`;
+    }
+
+    // Status badge or button
+    let actionHtml = '';
+    if(isFull) {
+      actionHtml = '<div class="res-badge">✓ Completo</div>';
+    } else if(count > 0) {
+      actionHtml = `<button class="reserve-btn partial" onclick="openModal(${g.id},'${g.name.replace(/'/g,"\'")}')">+ Reservar</button>`;
+    } else {
+      actionHtml = `<button class="reserve-btn" onclick="openModal(${g.id},'${g.name.replace(/'/g,"\'")}')">Reservar</button>`;
+    }
+
     card.innerHTML=`
       <div class="g-icon">${g.icon}</div>
       <div class="g-info">
         <div class="g-name">${g.name}</div>
-        ${g.qty>1?`<div class="g-meta">Quantidade desejada: ${g.qty}</div>`:''}
-        ${isRes?`<div class="g-by">✓ Reservado por ${r.nome} ${r.sobrenome}</div>`:''}
+        ${qtyHtml}
+        ${nomes ? `<div class="g-by">✓ ${nomes}</div>` : ''}
       </div>
-      <div class="g-action">
-        ${isRes
-          ?'<div class="res-badge">✓ Reservado</div>'
-          :`<button class="reserve-btn" onclick="openModal(${g.id},'${g.name.replace(/'/g,"\\'")}')">Reservar</button>`}
-      </div>`;
+      <div class="g-action">${actionHtml}</div>`;
     container.appendChild(card);
   });
 
-  const done=Object.keys(reservas).length, total=GIFTS.length;
-  document.getElementById('prog-cnt').textContent=done+' de '+total;
-  document.getElementById('prog-fill').style.width=Math.round(done/total*100)+'%';
+  // Progress — count total slots filled
+  const totalSlots = GIFTS.reduce((acc, g) => acc + g.qty, 0);
+  const filledSlots = GIFTS.reduce((acc, g) => acc + Math.min(getCount(g.id), g.qty), 0);
+  document.getElementById('prog-cnt').textContent=filledSlots+' de '+totalSlots;
+  document.getElementById('prog-fill').style.width=Math.round(filledSlots/totalSlots*100)+'%';
 }
 
 function filterCat(cat,el){
@@ -283,8 +352,12 @@ function filterCat(cat,el){
   renderList(cat);
 }
 
+// ── MODAL ──
 function openModal(id,name){
-  if(reservas[id]){showToast('Este presente já foi reservado!','error');return;}
+  const count = getCount(id);
+  const gift = GIFTS.find(g=>g.id===id);
+  if(count >= gift.qty){showToast('Este presente já está completo!','error');return;}
+
   currentGiftId=id;
   document.getElementById('m-item-name').textContent=name;
   ['f-nome','f-sob','f-email','f-msg'].forEach(fid=>{const el=document.getElementById(fid);el.value='';el.classList.remove('err');});
@@ -301,9 +374,8 @@ function closeModal(){
 }
 
 function setBtnState(loading){
-  const btn=document.getElementById('m-btn'), txt=document.getElementById('m-btn-txt');
-  btn.disabled=loading;
-  txt.textContent=loading?'Salvando...':'Confirmar Reserva';
+  const btn=document.getElementById('m-btn'),txt=document.getElementById('m-btn-txt');
+  btn.disabled=loading; txt.textContent=loading?'Salvando...':'Confirmar Reserva';
   const sp=btn.querySelector('.btn-sp');
   if(loading&&!sp){const d=document.createElement('div');d.className='btn-sp';btn.insertBefore(d,txt);}
   if(!loading&&sp)sp.remove();
@@ -328,13 +400,19 @@ async function confirmReserve(){
 
   setBtnState(true);
   const giftId=currentGiftId;
-  const giftName=GIFTS.find(g=>g.id===giftId)?.name||'';
+  const gift=GIFTS.find(g=>g.id===giftId);
+  const giftName=gift?.name||'';
+  const qty=gift?.qty||1;
 
   try{
+    // Transaction on the entire gift node to check count atomically
     const result=await new Promise((resolve,reject)=>{
       db.ref('reservas/'+giftId).transaction(current=>{
-        if(current!==null)return undefined; // abort — already taken
-        return{nome,sobrenome:sob,email,msg,presente:giftName,timestamp:new Date().toISOString()};
+        const currentCount = current ? Object.keys(current).length : 0;
+        if(currentCount >= qty) return undefined; // abort — full
+        const newEntry = {nome,sobrenome:sob,email,msg,presente:giftName,timestamp:new Date().toISOString()};
+        const newKey = db.ref().push().key;
+        return {...(current||{}), [newKey]: newEntry};
       },(error,committed)=>{
         if(error)reject(error);else resolve(committed);
       });
@@ -342,7 +420,7 @@ async function confirmReserve(){
 
     closeModal();
     if(result){showToast('✓ Presente reservado com carinho!','success');}
-    else{showToast('Esse presente acabou de ser reservado por outra pessoa!','error');}
+    else{showToast('Esse presente já foi completamente reservado!','error');}
   }catch(err){
     console.error(err);
     showToast('Erro de conexão. Tente novamente.','error');
@@ -372,5 +450,3 @@ function showToast(msg,type='success'){
   loop();
 })();
 </script>
-</body>
-</html>
